@@ -1,0 +1,26 @@
+S := top_statement_list <opt_ws> | <opt_ws>
+top_statement_list ::= top_statement <ws> top_statement_list | top_statement | <opt_ws>
+top_statement ::= statement | '{' top_statement_list '}' | class_statement | function_statement | <opt_ws>
+class_statement ::= T_CLASS keyword class_extends* <opt_ws> statement
+class_extends ::= T_EXTENDS <ws> keyword
+function_statement ::= T_FUNC keyword <opt_ws> ARGS_CONST <opt_ws> statement <opt_ws>
+statement ::= '{' <opt_ws> inner_statement_list <opt_ws> '}' | expression | <opt_ws>
+inner_statement_list ::= inner_statement_list <opt_ws> inner_statement | inner_statement | <opt_ws> 
+inner_statement ::= PROP_MOD* <ws> function_statement | class_statement | statement | block_statement
+block_statement ::= keyword <opt_ws> '(' #'[^)]*'  ')' <opt_ws> statement <opt_ws>
+
+wrapped_expr ::= <opt_ws> expression <opt_ws>
+expression ::= VAR <opt_ws> ';'| expr_wo_var | keyword <opt_ws> SCALAR <opt_ws> ';'
+expr_wo_var ::= VAR <opt_ws> '=' <opt_ws> expression
+ARGS_CONST = '(' (<opt_ws> ARGS_LIST <opt_ws> | <opt_ws>) ')'
+ARGS_LIST = ARGS_LIST <opt_ws> ',' <opt_ws> VAR | VAR
+VAR_EXPR = VAR <opt_ws> '=' <opt_ws> SCALAR | VAR
+VAR = PROP_MOD* <ws> '$' keyword | '$' '{' '}' 
+T_CLASS = 'class' <ws>
+T_EXTENDS = 'extends' <ws>
+T_FUNC = 'function' <ws> 
+PROP_MOD = 'public' | 'private' | 'protected' | 'const' | <opt_ws>
+keyword ::= #'[a-zA-Z_0-9]+'
+ws ::= #'\s+'
+opt_ws ::= #'\s*'
+SCALAR = #'"[^"]*"' | #'\'[^\']*\'' | #'[0-9]'
