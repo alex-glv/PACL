@@ -6,7 +6,10 @@ class AbstractClass {
       echo "hi!";
         }
   }
-}
+  private function testFun2($arg, $arg2) {
+    return 'val';
+  }
+    }
 
 function grossStuff() {
 } 

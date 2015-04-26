@@ -1,26 +1,924 @@
-S := top_statement_list <opt_ws> | <opt_ws>
-top_statement_list ::= top_statement <ws> top_statement_list | top_statement | <opt_ws>
-top_statement ::= statement | '{' top_statement_list '}' | class_statement | function_statement | <opt_ws>
-class_statement ::= T_CLASS keyword class_extends* <opt_ws> statement
-class_extends ::= T_EXTENDS <ws> keyword
-function_statement ::= T_FUNC keyword <opt_ws> ARGS_CONST <opt_ws> statement <opt_ws>
-statement ::= '{' <opt_ws> inner_statement_list <opt_ws> '}' | expression | <opt_ws>
-inner_statement_list ::= inner_statement_list <opt_ws> inner_statement | inner_statement | <opt_ws> 
-inner_statement ::= PROP_MOD* <ws> function_statement | class_statement | statement | block_statement
-block_statement ::= keyword <opt_ws> '(' #'[^)]*'  ')' <opt_ws> statement <opt_ws>
+T_LNUMBER   ::= #'[0-9]+'
+T_DNUMBER   ::= "floating-point number "
+T_STRING    ::= #'"[^"]*"' | #'\'[^\']*\'' | #'[0-9]+'
+T_VARIABLE  ::= #'.+?'
+T_INLINE_HTML ::= #'.+'
+T_ENCAPSED_AND_WHITESPACE  ::= "quoted-string and whitespace "
+T_CONSTANT_ENCAPSED_STRING ::= "quoted-string "
+T_STRING_VARNAME ::= #'[a-zA-Z_0-9]+'
+T_NUM_STRING ::= #'[0-9]+'
 
-wrapped_expr ::= <opt_ws> expression <opt_ws>
-expression ::= VAR <opt_ws> ';'| expr_wo_var | keyword <opt_ws> SCALAR <opt_ws> ';'
-expr_wo_var ::= VAR <opt_ws> '=' <opt_ws> expression
-ARGS_CONST = '(' (<opt_ws> ARGS_LIST <opt_ws> | <opt_ws>) ')'
-ARGS_LIST = ARGS_LIST <opt_ws> ',' <opt_ws> VAR | VAR
-VAR_EXPR = VAR <opt_ws> '=' <opt_ws> SCALAR | VAR
-VAR = PROP_MOD* <ws> '$' keyword | '$' '{' '}' 
-T_CLASS = 'class' <ws>
-T_EXTENDS = 'extends' <ws>
-T_FUNC = 'function' <ws> 
-PROP_MOD = 'public' | 'private' | 'protected' | 'const' | <opt_ws>
-keyword ::= #'[a-zA-Z_0-9]+'
-ws ::= #'\s+'
-opt_ws ::= #'\s*'
-SCALAR = #'"[^"]*"' | #'\'[^\']*\'' | #'[0-9]'
+END ::= '0'
+T_INCLUDE    ::= "include"
+T_INCLUDE_ONCE ::= "include_once"
+T_EVAL       ::= "eval"
+T_REQUIRE    ::= "require"
+T_REQUIRE_ONCE ::= "require_once"
+T_LOGICAL_OR ::= "or"
+T_LOGICAL_XOR::= "xor"
+T_LOGICAL_AND::= "and"
+T_PRINT      ::= "print"
+T_YIELD      ::= "yield"
+T_YIELD_FROM ::= "yield from"
+T_PLUS_EQUAL ::= "+="
+T_MINUS_EQUAL::= "-="
+T_MUL_EQUAL  ::= "*="
+T_DIV_EQUAL  ::= "/="
+T_CONCAT_EQUAL::=  ".="
+T_MOD_EQUAL  ::= "%="
+T_AND_EQUAL  ::= "&="
+T_OR_EQUAL   ::= "|="
+T_XOR_EQUAL  ::= "^="
+T_SL_EQUAL   ::= "<<="
+T_SR_EQUAL   ::= ">>="
+T_BOOLEAN_OR ::= "||"
+T_BOOLEAN_AND::= "&&"
+T_IS_EQUAL   ::= "=="
+T_IS_NOT_EQUAL ::= "!="
+T_IS_IDENTICAL ::= "==="
+T_IS_NOT_IDENTICAL ::= "!=="
+T_IS_SMALLER_OR_EQUAL ::= "<="
+T_IS_GREATER_OR_EQUAL ::= ">="
+T_SPACESHIP ::= "<=>"
+T_SL ::= "<<"
+T_SR ::= ">>"
+T_INSTANCEOF::= "instanceof"
+T_INC ::= "++"
+T_DEC ::= "--"
+T_INT_CAST  ::= "(int)"
+T_DOUBLE_CAST ::= "(double)"
+T_STRING_CAST ::= "(string)"
+T_ARRAY_CAST::= "(array)"
+T_OBJECT_CAST ::= "(object)"
+T_BOOL_CAST ::= "(bool)"
+T_UNSET_CAST::= "(unset)"
+T_NEW     ::= "new"
+T_CLONE   ::= "clone"
+T_EXIT    ::= "exit"
+T_IF      ::= "if"
+T_ELSEIF  ::= "elseif"
+T_ELSE    ::= "else"
+T_ENDIF   ::= "endif"
+T_ECHO     ::= "echo"
+T_DO       ::= "do"
+T_WHILE    ::= "while"
+T_ENDWHILE ::= "endwhile"
+T_FOR      ::= "for"
+T_ENDFOR   ::= "endfor"
+T_FOREACH  ::= "foreach"
+T_ENDFOREACH ::= "endforeach"
+T_DECLARE  ::= "declare"
+T_ENDDECLARE ::= "enddeclare"
+T_AS       ::= "as"
+T_SWITCH   ::= "switch"
+T_ENDSWITCH::= "endswitch"
+T_CASE     ::= "case"
+T_DEFAULT  ::= "default"
+T_BREAK    ::= "break"
+T_CONTINUE ::= "continue"
+T_GOTO     ::= "goto"
+T_FUNCTION ::= "function"
+T_CONST    ::= "const"
+T_RETURN   ::= "return"
+T_TRY      ::= "try"
+T_CATCH    ::= "catch"
+T_FINALLY  ::= "finally"
+T_THROW    ::= "throw"
+T_USE      ::= "use"
+T_INSTEADOF::= "insteadof"
+T_GLOBAL   ::= "global"
+T_STATIC   ::= "static"
+T_ABSTRACT ::= "abstract"
+T_FINAL    ::= "final"
+T_PRIVATE  ::= "private"
+T_PROTECTED::= "protected"
+T_PUBLIC   ::= "public"
+T_VAR      ::= "var"
+T_UNSET    ::= "unset"
+T_ISSET    ::= "isset"
+T_EMPTY    ::= "empty"
+T_HALT_COMPILER ::= "__halt_compiler"
+T_CLASS    ::= "class"
+T_TRAIT    ::= "trait"
+T_INTERFACE::= "interface"
+T_EXTENDS  ::= "extends"
+T_IMPLEMENTS ::= "implements"
+T_OBJECT_OPERATOR ::= "->"
+T_DOUBLE_ARROW  ::= "=>"
+T_LIST          ::= "list"
+T_ARRAY         ::= "array"
+T_CALLABLE      ::= "callable"
+T_LINE          ::= "__LINE__"
+T_FILE          ::= "__FILE__"
+T_DIR           ::= "__DIR__"
+T_CLASS_C       ::= "__CLASS__"
+T_TRAIT_C       ::= "__TRAIT__"
+T_METHOD_C      ::= "__METHOD__"
+T_FUNC_C        ::= "__FUNCTION__"
+T_COMMENT       ::= "comment"
+T_DOC_COMMENT   ::= "doc comment"
+T_OPEN_TAG      ::= "open tag"
+T_OPEN_TAG_WITH_ECHO ::= "open tag with echo"
+T_CLOSE_TAG     ::= "close tag"
+T_WHITESPACE    ::= "whitespace"
+T_START_HEREDOC ::= "heredoc start"
+T_END_HEREDOC   ::= "heredoc end"
+T_DOLLAR_OPEN_CURLY_BRACES ::= "${"
+T_CURLY_OPEN    ::= "{$"
+T_PAAMAYIM_NEKUDOTAYIM ::= "::"
+T_NAMESPACE     ::= "namespace"
+T_NS_C          ::= "__NAMESPACE__"
+T_NS_SEPARATOR  ::= "\\"
+T_ELLIPSIS      ::= "..."
+T_COALESCE      ::= "??"
+T_POW           ::= "**"
+T_POW_EQUAL     ::= "**="
+T_ERROR ::= ''
+
+S := top_statement_list | <EMPTY>
+name:
+		namespace_name
+	|	T_NAMESPACE T_NS_SEPARATOR namespace_name
+	|	T_NS_SEPARATOR namespace_name
+;
+
+namespace_name ::= T_STRING
+|	T_NAMESPACE T_NS_SEPARATOR namespace_name
+|	T_NS_SEPARATOR namespace_name
+
+top_statement_list:
+		top_statement_list top_statement 
+	|	<EMPTY>
+;
+top_statement:
+		statement
+	|	function_declaration_statement
+	|	class_declaration_statement	
+	|	trait_declaration_statement
+	|	interface_declaration_statement
+	|	T_HALT_COMPILER '(' ')' ';'
+	|	T_NAMESPACE namespace_name ';'
+	|	T_NAMESPACE namespace_name
+	|	T_NAMESPACE 
+	|	T_USE mixed_group_use_declaration ';'
+	|	T_USE use_type group_use_declaration ';'
+	|	T_USE use_declarations ';'
+	|	T_USE use_type use_declarations ';'
+	|	T_CONST const_list ';'
+;
+
+use_type:
+	 	T_FUNCTION
+	| 	T_CONST
+;
+
+group_use_declaration:
+	namespace_name T_NS_SEPARATOR '{' use_declarations '}'
+
+mixed_group_use_declaration:
+	namespace_name T_NS_SEPARATOR '{' inline_use_declarations '}'
+		
+;
+inline_use_declarations:
+		inline_use_declarations ',' inline_use_declaration
+			
+	|	inline_use_declaration
+			
+;
+
+inline_use_declaration:
+		use_declaration 
+	|	use_type use_declaration 
+;
+
+use_declarations:
+		use_declarations ',' use_declaration
+			
+	|	use_declaration
+			
+;
+use_declaration:
+		namespace_name
+			
+	|	namespace_name T_AS T_STRING
+			
+	|	T_NS_SEPARATOR namespace_name
+			
+	|	T_NS_SEPARATOR namespace_name T_AS T_STRING
+			
+;
+const_list:
+		const_list ',' const_decl 
+	|	const_decl 
+;
+inner_statement_list:
+		inner_statement_list inner_statement
+			
+	|	<EMPTY>
+			
+;
+inner_statement:
+		statement 
+	|	function_declaration_statement 		
+	|	class_declaration_statement 		
+	|	trait_declaration_statement			
+	|	interface_declaration_statement		
+	|	T_HALT_COMPILER '(' ')' ';'
+;
+statement:
+		'{' inner_statement_list '}' 
+	|	if_stmt 
+	|	alt_if_stmt 
+	|	T_WHILE '(' expr ')' while_statement
+			
+	|	T_DO statement T_WHILE '(' expr ')' ';'
+			
+	|	T_FOR '(' for_exprs ';' for_exprs ';' for_exprs ')' for_statement
+			
+	|	T_SWITCH '(' expr ')' switch_case_list
+			
+	|	T_BREAK optional_expr ';'		
+	|	T_CONTINUE optional_expr ';'	
+	|	T_RETURN optional_expr ';'		
+	|	T_GLOBAL global_var_list ';'	
+	|	T_STATIC static_var_list ';'	
+	|	T_ECHO echo_expr_list ';'		
+	|	T_INLINE_HTML 
+	|	expr ';' 
+	|	T_UNSET '(' unset_variables ')' ';' 
+	|	T_FOREACH '(' expr T_AS foreach_variable ')' foreach_statement
+			
+	|	T_FOREACH '(' expr T_AS foreach_variable T_DOUBLE_ARROW foreach_variable ')'
+		foreach_statement
+			
+	|	T_DECLARE '(' const_list ')'
+			
+		declare_statement
+			
+	|	';'	<EMPTY> 
+	|	T_TRY '{' inner_statement_list '}' catch_list finally_statement
+			
+	|	T_THROW expr ';' 
+	|	T_GOTO T_STRING ';' 
+	|	T_STRING ':' 
+;
+catch_list:
+		<EMPTY>
+			
+	|	catch_list T_CATCH '(' name T_VARIABLE ')' '{' inner_statement_list '}'
+			
+;
+finally_statement:
+		<EMPTY> 
+	|	T_FINALLY '{' inner_statement_list '}' 
+;
+unset_variables:
+		unset_variable 
+	|	unset_variables ',' unset_variable 
+;
+unset_variable:
+		variable 
+;
+function_declaration_statement:
+	function returns_ref T_STRING '(' parameter_list ')' return_type
+	backup_doc_comment '{' inner_statement_list '}'
+;
+is_reference:
+		<EMPTY>	
+	|	'&'			
+;
+is_variadic:
+		<EMPTY> 
+	|	T_ELLIPSIS  
+;
+class_declaration_statement:
+		class_modifiers T_CLASS 
+		T_STRING extends_from implements_list backup_doc_comment '{' class_statement_list '}'
+			
+	|	T_CLASS 
+		T_STRING extends_from implements_list backup_doc_comment '{' class_statement_list '}'
+			
+;
+class_modifiers:
+		class_modifier 					
+	|	class_modifiers class_modifier 	
+;
+class_modifier:
+		T_ABSTRACT 		
+	|	T_FINAL 		
+;
+trait_declaration_statement:
+		T_TRAIT 
+		T_STRING backup_doc_comment '{' class_statement_list '}'
+			
+;
+interface_declaration_statement:
+		T_INTERFACE 
+		T_STRING interface_extends_list backup_doc_comment '{' class_statement_list '}'
+			
+;
+extends_from:
+		<EMPTY>		
+	|	T_EXTENDS name	
+;
+interface_extends_list:
+		<EMPTY>			
+	|	T_EXTENDS name_list	
+;
+implements_list:
+		<EMPTY>				
+	|	T_IMPLEMENTS name_list	
+;
+foreach_variable:
+		variable			
+	|	'&' variable		
+	|	T_LIST '(' assignment_list ')' 
+;
+for_statement:
+		statement 
+	|	':' inner_statement_list T_ENDFOR ';' 
+;
+foreach_statement:
+		statement 
+	|	':' inner_statement_list T_ENDFOREACH ';' 
+;
+declare_statement:
+		statement 
+	|	':' inner_statement_list T_ENDDECLARE ';' 
+;
+switch_case_list:
+		'{' case_list '}'					
+	|	'{' ';' case_list '}'				
+	|	':' case_list T_ENDSWITCH ';'		
+	|	':' ';' case_list T_ENDSWITCH ';'	
+;
+case_list:
+		<EMPTY> 
+	|	case_list T_CASE expr case_separator inner_statement_list
+			
+	|	case_list T_DEFAULT case_separator inner_statement_list
+			
+;
+case_separator:
+		':'
+	|	';'
+;
+while_statement:
+		statement 
+	|	':' inner_statement_list T_ENDWHILE ';' 
+;
+if_stmt_without_else:
+		T_IF '(' expr ')' statement
+	|	if_stmt_without_else T_ELSEIF '(' expr ')' statement
+;
+if_stmt:
+		if_stmt_without_else 
+	|	if_stmt_without_else T_ELSE statement
+			
+;
+alt_if_stmt_without_else:
+		T_IF '(' expr ')' ':' inner_statement_list
+	|	alt_if_stmt_without_else T_ELSEIF '(' expr ')' ':' inner_statement_list
+;
+alt_if_stmt:
+		alt_if_stmt_without_else T_ENDIF ';' 
+	|	alt_if_stmt_without_else T_ELSE ':' inner_statement_list T_ENDIF ';'
+;
+parameter_list:
+		non_empty_parameter_list 
+	|	<EMPTY>	
+;
+non_empty_parameter_list:
+		parameter
+			
+	|	non_empty_parameter_list ',' parameter
+			
+;
+parameter:
+		optional_type is_reference is_variadic T_VARIABLE
+			
+	|	optional_type is_reference is_variadic T_VARIABLE '=' expr
+			
+;
+optional_type:
+		<EMPTY>	
+	|	type		
+;
+type:
+		T_ARRAY		
+	|	T_CALLABLE	
+	|	name		
+;
+return_type:
+		<EMPTY>	
+	|	':' type	
+;
+argument_list:
+		'(' ')'	
+	|	'(' non_empty_argument_list ')' 
+;
+non_empty_argument_list:
+		argument
+			
+	|	non_empty_argument_list ',' argument
+			
+;
+argument:
+		expr			
+	|	T_ELLIPSIS expr	
+;
+global_var_list:
+		global_var_list ',' global_var 
+	|	global_var 
+;
+global_var:
+	simple_variable
+		
+;
+static_var_list:
+		static_var_list ',' static_var 
+	|	static_var 
+;
+static_var:
+		T_VARIABLE			
+	|	T_VARIABLE '=' expr	
+;
+class_statement_list:
+		class_statement_list class_statement
+			
+	|	<EMPTY>
+			
+;
+class_statement:
+		variable_modifiers property_list ';'
+			
+	|	T_CONST class_const_list ';'
+			
+	|	T_USE name_list trait_adaptations
+			
+	|	method_modifiers function returns_ref T_STRING '(' parameter_list ')'
+		return_type backup_doc_comment method_body
+;
+name_list:
+		name 
+	|	name_list ',' name 
+;
+trait_adaptations:
+		';'								
+	|	'{' '}'							
+	|	'{' trait_adaptation_list '}'	
+;
+trait_adaptation_list:
+		trait_adaptation
+			
+	|	trait_adaptation_list trait_adaptation
+			
+;
+trait_adaptation:
+		trait_precedence ';'	
+	|	trait_alias ';'			
+;
+trait_precedence:
+	absolute_trait_method_reference T_INSTEADOF name_list
+		
+;
+trait_alias:
+		trait_method_reference T_AS trait_modifiers T_STRING
+			
+	|	trait_method_reference T_AS member_modifier
+			
+;
+trait_method_reference:
+		T_STRING
+			
+	|	absolute_trait_method_reference 
+;
+absolute_trait_method_reference:
+	name T_PAAMAYIM_NEKUDOTAYIM T_STRING
+		
+;
+trait_modifiers:
+		<EMPTY>		
+	|	member_modifier	
+;
+method_body:
+		';' 
+	|	'{' inner_statement_list '}'	
+;
+variable_modifiers:
+		non_empty_member_modifiers		
+	|	T_VAR							
+;
+method_modifiers:
+		<EMPTY>						
+	|	non_empty_member_modifiers
+			
+;
+non_empty_member_modifiers:
+		member_modifier			
+	|	non_empty_member_modifiers member_modifier
+			
+;
+member_modifier:
+		T_PUBLIC				
+	|	T_PROTECTED				
+	|	T_PRIVATE				
+	|	T_STATIC				
+	|	T_ABSTRACT				
+	|	T_FINAL					
+;
+property_list:
+		property_list ',' property 
+	|	property 
+;
+property:
+		T_VARIABLE 
+	|	T_VARIABLE '=' expr
+			
+;
+class_const_list:
+		class_const_list ',' const_decl 
+	|	const_decl 
+;
+const_decl:
+	T_STRING '=' expr 
+;
+echo_expr_list:
+		echo_expr_list ',' echo_expr 
+	|	echo_expr 
+;
+echo_expr:
+	expr 
+;
+for_exprs:
+		<EMPTY>			
+	|	non_empty_for_exprs	
+;
+non_empty_for_exprs:
+		non_empty_for_exprs ',' expr 
+	|	expr 
+;
+new_expr:
+		T_NEW class_name_reference ctor_arguments
+			
+;
+expr_without_variable:
+		T_LIST '(' assignment_list ')' '=' expr
+			
+	|	variable '=' expr
+			
+	|	variable '=' '&' variable
+			
+	|	T_CLONE expr 
+	|	variable T_PLUS_EQUAL expr
+			
+	|	variable T_MINUS_EQUAL expr
+			
+	|	variable T_MUL_EQUAL expr
+			
+	|	variable T_POW_EQUAL expr
+			
+	|	variable T_DIV_EQUAL expr
+			
+	|	variable T_CONCAT_EQUAL expr
+			
+	|	variable T_MOD_EQUAL expr
+			
+	|	variable T_AND_EQUAL expr
+			
+	|	variable T_OR_EQUAL expr
+			
+	|	variable T_XOR_EQUAL expr
+			
+	|	variable T_SL_EQUAL expr
+			
+	|	variable T_SR_EQUAL expr
+			
+	|	variable T_INC 
+	|	T_INC variable 
+	|	variable T_DEC 
+	|	T_DEC variable 
+	|	expr T_BOOLEAN_OR expr
+			
+	|	expr T_BOOLEAN_AND expr
+			
+	|	expr T_LOGICAL_OR expr
+			
+	|	expr T_LOGICAL_AND expr
+			
+	|	expr T_LOGICAL_XOR expr
+			
+	|	expr '|' expr	
+	|	expr '&' expr	
+	|	expr '^' expr	
+	|	expr '.' expr 	
+	|	expr '+' expr 	
+	|	expr '-' expr 	
+	|	expr '*' expr	
+	|	expr T_POW expr	
+	|	expr '/' expr	
+	|	expr '%' expr 	
+	| 	expr T_SL expr	
+	|	expr T_SR expr	
+	|	'+' expr 
+	|	'-' expr
+	|	'!' expr 
+	|	'~' expr 
+	|	expr T_IS_IDENTICAL expr
+			
+	|	expr T_IS_NOT_IDENTICAL expr
+			
+	|	expr T_IS_EQUAL expr
+			
+	|	expr T_IS_NOT_EQUAL expr
+			
+	|	expr '<' expr
+			
+	|	expr T_IS_SMALLER_OR_EQUAL expr
+			
+	|	expr '>' expr
+			
+	|	expr T_IS_GREATER_OR_EQUAL expr
+			
+	|	expr T_SPACESHIP expr
+			
+	|	expr T_INSTANCEOF class_name_reference
+			
+	|	'(' expr ')' 
+	|	new_expr 
+	|	expr '?' expr ':' expr
+			
+	|	expr '?' ':' expr
+			
+	|	expr T_COALESCE expr
+			
+	|	internal_functions_in_yacc 
+	|	T_INT_CAST expr		
+	|	T_DOUBLE_CAST expr	
+	|	T_STRING_CAST expr	
+	|	T_ARRAY_CAST expr	
+	|	T_OBJECT_CAST expr	
+	|	T_BOOL_CAST expr	
+	|	T_UNSET_CAST expr	
+	|	T_EXIT exit_expr	
+	|	'@' expr			
+	|	scalar 
+	|	'`' backticks_expr '`' 
+	|	T_PRINT expr 
+	|	T_YIELD 
+	|	T_YIELD expr 
+	|	T_YIELD expr T_DOUBLE_ARROW expr 
+	|	T_YIELD_FROM expr 
+	|	function returns_ref '(' parameter_list ')' lexical_vars return_type
+		backup_doc_comment '{' inner_statement_list '}'
+	|	T_STATIC function returns_ref '(' parameter_list ')' lexical_vars
+		return_type backup_doc_comment '{' inner_statement_list '}'
+;
+function:
+	T_FUNCTION 
+;
+backup_doc_comment:
+	<EMPTY> 
+;
+returns_ref:
+		<EMPTY>	
+	|	'&'			
+;
+lexical_vars:
+		<EMPTY> 
+	|	T_USE '(' lexical_var_list ')' 
+;
+lexical_var_list:
+		lexical_var_list ',' lexical_var 
+	|	lexical_var 
+;
+lexical_var:
+		T_VARIABLE		
+	|	'&' T_VARIABLE	
+;
+function_call:
+		name argument_list
+			
+	|	class_name T_PAAMAYIM_NEKUDOTAYIM member_name argument_list
+			
+	|	variable_class_name T_PAAMAYIM_NEKUDOTAYIM member_name argument_list
+			
+	|	callable_expr argument_list
+			
+;
+class_name:
+		T_STATIC
+	|	name 
+;
+class_name_reference:
+		class_name		
+	|	new_variable	
+;
+exit_expr:
+		<EMPTY>				
+	|	'(' optional_expr ')'	
+;
+backticks_expr:
+		<EMPTY>
+			
+	|	T_ENCAPSED_AND_WHITESPACE 
+	|	encaps_list 
+;
+ctor_arguments:
+		<EMPTY>	
+	|	argument_list 
+;
+dereferencable_scalar:
+		T_ARRAY '(' array_pair_list ')'	
+	|	'[' array_pair_list ']'			
+	|	T_CONSTANT_ENCAPSED_STRING		
+;
+scalar:
+		T_LNUMBER 	
+	|	T_DNUMBER 	
+	|	T_LINE 		
+	|	T_FILE 		
+	|	T_DIR   	
+	|	T_TRAIT_C	
+	|	T_METHOD_C	
+	|	T_FUNC_C	
+	|	T_NS_C		
+	|	T_CLASS_C	
+	|	T_START_HEREDOC T_ENCAPSED_AND_WHITESPACE T_END_HEREDOC 
+	|	T_START_HEREDOC T_END_HEREDOC
+			
+	|	'"' encaps_list '"' 	
+	|	T_START_HEREDOC encaps_list T_END_HEREDOC 
+	|	dereferencable_scalar	
+	|	class_name_scalar	
+	|	constant			
+;
+constant:
+		name 
+	|	class_name T_PAAMAYIM_NEKUDOTAYIM T_STRING
+			
+	|	variable_class_name T_PAAMAYIM_NEKUDOTAYIM T_STRING
+			
+;
+possible_comma:
+		<EMPTY>
+	|	','
+;
+expr:
+		variable					
+	|	expr_without_variable		
+;
+optional_expr:
+		<EMPTY>	
+	|	expr		
+;
+variable_class_name:
+	dereferencable 
+;
+dereferencable:
+		variable				
+	|	'(' expr ')'			
+	|	dereferencable_scalar	
+;
+callable_expr:
+		callable_variable		
+	|	'(' expr ')'			
+	|	dereferencable_scalar	
+;
+callable_variable:
+		simple_variable
+			
+	|	dereferencable '[' optional_expr ']'
+			
+	|	constant '[' optional_expr ']'
+			
+	|	dereferencable '{' expr '}'
+			
+	|	dereferencable T_OBJECT_OPERATOR member_name argument_list
+			
+	|	function_call 
+;
+variable:
+		callable_variable
+			
+	|	static_member
+			
+	|	dereferencable T_OBJECT_OPERATOR member_name
+			
+;
+simple_variable:
+		T_VARIABLE			
+	|	'$' '{' expr '}'	
+	|	'$' simple_variable	
+;
+static_member:
+		class_name T_PAAMAYIM_NEKUDOTAYIM simple_variable
+			
+	|	variable_class_name T_PAAMAYIM_NEKUDOTAYIM simple_variable
+			
+;
+new_variable:
+		simple_variable
+			
+	|	new_variable '[' optional_expr ']'
+			
+	|	new_variable '{' expr '}'
+			
+	|	new_variable T_OBJECT_OPERATOR member_name
+			
+	|	class_name T_PAAMAYIM_NEKUDOTAYIM simple_variable
+			
+	|	new_variable T_PAAMAYIM_NEKUDOTAYIM simple_variable
+			
+;
+member_name:
+		T_STRING		
+	|	'{' expr '}'	
+	|	simple_variable	
+;
+assignment_list:
+		assignment_list ',' assignment_list_element
+			
+	|	assignment_list_element
+			
+;
+assignment_list_element:
+		variable						
+	|	T_LIST '(' assignment_list ')'	
+	|	<EMPTY>						
+;
+array_pair_list:
+		<EMPTY> 
+	|	non_empty_array_pair_list possible_comma 
+;
+non_empty_array_pair_list:
+		non_empty_array_pair_list ',' array_pair
+			
+	|	array_pair
+			
+;
+array_pair:
+		expr T_DOUBLE_ARROW expr
+			
+	|	expr 
+	|	expr T_DOUBLE_ARROW '&' variable
+			
+	|	'&' variable
+			
+;
+encaps_list:
+		encaps_list encaps_var
+			
+	|	encaps_list T_ENCAPSED_AND_WHITESPACE
+			
+	|	encaps_var
+			
+	|	T_ENCAPSED_AND_WHITESPACE encaps_var
+			
+;
+encaps_var:
+		T_VARIABLE
+			
+	|	T_VARIABLE '[' encaps_var_offset ']'
+	|	T_VARIABLE T_OBJECT_OPERATOR T_STRING
+	|	T_DOLLAR_OPEN_CURLY_BRACES expr '}'
+			
+	|	T_DOLLAR_OPEN_CURLY_BRACES T_STRING_VARNAME '}'
+			
+	|	T_DOLLAR_OPEN_CURLY_BRACES T_STRING_VARNAME '[' expr ']' '}'
+	|	T_CURLY_OPEN variable '}' 
+;
+encaps_var_offset:
+		T_STRING		
+	|	T_NUM_STRING	
+	|	T_VARIABLE		
+;
+internal_functions_in_yacc:
+		T_ISSET '(' isset_variables ')' 
+	|	T_EMPTY '(' expr ')' 
+	|	T_INCLUDE expr
+			
+	|	T_INCLUDE_ONCE expr
+			
+	|	T_EVAL '(' expr ')'
+			
+	|	T_REQUIRE expr
+			
+	|	T_REQUIRE_ONCE expr
+			
+;
+isset_variables:
+		isset_variable 
+	|	isset_variables ',' isset_variable
+			
+;
+isset_variable:
+		expr 
+;
+class_name_scalar:
+	class_name T_PAAMAYIM_NEKUDOTAYIM T_CLASS
+		
+;
+
+EMPTY:
+  #'\s*'
