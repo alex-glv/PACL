@@ -1,11 +1,13 @@
+S = top_statement_list | <EMPTY>
+
 T_LNUMBER   ::= #'[0-9]+'
-T_DNUMBER   ::= "floating-point number "
-T_STRING    ::= #'"[^"]*"' | #'\'[^\']*\'' | #'[0-9]+'
-T_VARIABLE  ::= #'.+?'
-T_INLINE_HTML ::= #'.+'
+T_DNUMBER   ::=  (#'[0-9]*[\.]'{T_LNUMBER}) | ({T_LNUMBER}#'[\.][0-9]*')
+T_STRING    ::= #'[^\s;\(\{\}\)]+'
+T_VARIABLE  ::= #'[^\s;\(\{\}\)]+'
+T_INLINE_HTML ::= '...' (* to do *)
 T_ENCAPSED_AND_WHITESPACE  ::= "quoted-string and whitespace "
 T_CONSTANT_ENCAPSED_STRING ::= "quoted-string "
-T_STRING_VARNAME ::= #'[a-zA-Z_0-9]+'
+T_STRING_VARNAME ::= #'[^}]+' 
 T_NUM_STRING ::= #'[0-9]+'
 
 END ::= '0'
@@ -135,7 +137,6 @@ T_POW           ::= "**"
 T_POW_EQUAL     ::= "**="
 T_ERROR ::= ''
 
-S := top_statement_list | <EMPTY>
 name:
 		namespace_name
 	|	T_NAMESPACE T_NS_SEPARATOR namespace_name
@@ -450,7 +451,7 @@ class_statement_list:
 			
 ;
 class_statement:
-		variable_modifiers property_list ';'
+		variable_modifiers property_list ';' 
 			
 	|	T_CONST class_const_list ';'
 			
