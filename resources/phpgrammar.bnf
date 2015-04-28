@@ -2,12 +2,12 @@ S = top_statement_list | <EMPTY>
 
 T_LNUMBER   ::= #'[0-9]+'
 T_DNUMBER   ::=  (#'[0-9]*[\.]'{T_LNUMBER}) | ({T_LNUMBER}#'[\.][0-9]*')
-T_STRING    ::= #'[^\s;\(\{\}\)]+'
-T_VARIABLE  ::= #'[^\s;\(\{\}\)]+'
+T_STRING    ::= #'[^\s;\{\(\[\]\)\}]+'
+T_VARIABLE  ::= #'[^\s;\{\(\[\]\)\}]+'
 T_INLINE_HTML ::= '...' (* to do *)
 T_ENCAPSED_AND_WHITESPACE  ::= "quoted-string and whitespace "
 T_CONSTANT_ENCAPSED_STRING ::= "quoted-string "
-T_STRING_VARNAME ::= #'[^}]+' 
+T_STRING_VARNAME ::= #'[^}\s;]+' 
 T_NUM_STRING ::= #'[0-9]+'
 
 END ::= '0'
@@ -117,12 +117,12 @@ T_CLASS_C       ::= "__CLASS__"
 T_TRAIT_C       ::= "__TRAIT__"
 T_METHOD_C      ::= "__METHOD__"
 T_FUNC_C        ::= "__FUNCTION__"
-T_COMMENT       ::= "comment"
-T_DOC_COMMENT   ::= "doc comment"
-T_OPEN_TAG      ::= "open tag"
+T_COMMENT       ::= "//"
+T_DOC_COMMENT   ::= "/*"
+T_OPEN_TAG      ::= "<?" | "<?php"
 T_OPEN_TAG_WITH_ECHO ::= "open tag with echo"
-T_CLOSE_TAG     ::= "close tag"
-T_WHITESPACE    ::= "whitespace"
+T_CLOSE_TAG     ::= "?>"
+T_WHITESPACE    ::= #'[\s]+'
 T_START_HEREDOC ::= "heredoc start"
 T_END_HEREDOC   ::= "heredoc end"
 T_DOLLAR_OPEN_CURLY_BRACES ::= "${"
@@ -679,7 +679,8 @@ function:
 	T_FUNCTION 
 ;
 backup_doc_comment:
-	<EMPTY> 
+<EMPTY> |
+#'\/\*(^\*\/)\*/'
 ;
 returns_ref:
 		<EMPTY>	
