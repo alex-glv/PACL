@@ -10,4 +10,4 @@
 (defn parse-f [file-name]
   (reset! ignore (insta/parser (get-contents "whitespace.bnf")))
   (reset! grammar (insta/parser (get-contents "phpgrammar.bnf") :auto-whitespace @ignore))
-  (grammar (get-contents file-name)))
+  (@grammar (get-contents file-name)))

@@ -2,8 +2,8 @@ S = top_statement_list | <EMPTY>
 
 T_LNUMBER   ::= #'[0-9]+'
 T_DNUMBER   ::=  (#'[0-9]*[\.]'{T_LNUMBER}) | ({T_LNUMBER}#'[\.][0-9]*')
-T_STRING    ::= #'[^\s;\{\(\[\]\)\}]+'
-T_VARIABLE  ::= #'[^\s;\{\(\[\]\)\}]+'
+T_STRING    ::= #'[^\s;\{\(\[\]\)\},]+'
+T_VARIABLE  ::= '$' #'[^\s;\{\(\[\]\)\},]+'
 T_INLINE_HTML ::= '...' (* to do *)
 T_ENCAPSED_AND_WHITESPACE  ::= "quoted-string and whitespace "
 T_CONSTANT_ENCAPSED_STRING ::= "quoted-string "
@@ -120,7 +120,7 @@ T_FUNC_C        ::= "__FUNCTION__"
 T_COMMENT       ::= "//"
 T_DOC_COMMENT   ::= "/*"
 T_OPEN_TAG      ::= "<?" | "<?php"
-T_OPEN_TAG_WITH_ECHO ::= "open tag with echo"
+T_OPEN_TAG_WITH_ECHO ::= "<?="
 T_CLOSE_TAG     ::= "?>"
 T_WHITESPACE    ::= #'[\s]+'
 T_START_HEREDOC ::= "heredoc start"
