@@ -22,3 +22,15 @@ context : (input)
 variable
 context : (inpunt)
 
+
+reader/processor
+cache
+  -> cache storage
+cache-store (obj)
+cache-retrieve (--)
+cache-rebuild
+
+runner
+  -> filewatch
+  -> build cache
+
