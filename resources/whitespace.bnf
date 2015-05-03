@@ -1,4 +1,5 @@
 whitespace = #'\s+'
+| whitespace* #'//[^\n]*\n*' whitespace*
 | #'(?s)\s*<\?php\s*'
 | #'(?s)\s*<\?\s*'
 | #'(?s)\s*\?>(^\?>)<\?php\s*'

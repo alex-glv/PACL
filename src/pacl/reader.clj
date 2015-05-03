@@ -23,10 +23,8 @@
 (def grammar
   (insta/parser (get-contents "phpgrammar.bnf" (comp io/file io/resource)) :auto-whitespace ignore))
 
-(defn parse-file [file-name]
+(defn parse-file [file-res]
   (when *debug*
-    (*debug-fn* "Parsing " file-name))
-  (grammar (get-contents file-name )))
-
-
-
+    (*debug-fn* "Parsing " file-res))
+  (grammar (get-contents file-res))
+  )
