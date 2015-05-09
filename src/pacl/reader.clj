@@ -7,11 +7,12 @@
 (def ^:dynamic *debug-fn* 'println)
 
 (defn get-contents
+  ;; replace slurp with buffered reader
   ([res-file] (slurp res-file))
   ([res-file fun] (slurp (fun res-file))))
 
 (defn get-files-by-mask [mask])
-(defn get-ast [file])
+
 (defn scan-dir [dir]
   (when *debug*
     (*debug-fn* "Scanning " dir))
@@ -23,8 +24,12 @@
 (def grammar
   (insta/parser (get-contents "phpgrammar.bnf" (comp io/file io/resource)) :auto-whitespace ignore))
 
-(defn parse-file [file-res]
+(defn get-ast [file-res]
   (when *debug*
     (*debug-fn* "Parsing " file-res))
-  (grammar (get-contents file-res))
-  )
+  (grammar (get-contents file-res)))
+
+(def context-map
+  [{:prefix "::" :recipient :static-method}
+   {:prefix "->" :recipient :method}
+   {:prefix "$" :recipient :all}])

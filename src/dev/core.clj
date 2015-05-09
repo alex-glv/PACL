@@ -1,13 +1,21 @@
 (ns dev.core
-  (:require [instaparse.core :as insta]))
+  (:require [pacl.reader :as rdr]
+            [clojure.java.io :as io]
+            [pacl.protocols :as p]
+            [clojure.walk :as walk] :reload-all))
+(defmulti ProcessTreePart
+  (fn [el] (if (coll? el)
+             (first el)
+             nil)
+    ))
 
-(def grammar (atom nil))
-(def ignore (atom nil))
-(defn get-contents [res-file]
-  (slurp (clojure.java.io/file  (clojure.java.io/resource res-file))))
+(def fil-cl (rdr/get-ast (io/resource "class.php")))
 
+(defmethod ProcessTreePart :class_declaration_statement [el] (println "from-class:") (prn el) el)
+(defmethod ProcessTreePart :class_statement [el] (println "class-statements:") (prn el) el)
+(defmethod ProcessTreePart :default [el] el)
 
-(defn parse-f [file-name]
-  (reset! ignore (insta/parser (get-contents "whitespace.bnf")))
-  (reset! grammar (insta/parser (get-contents "phpgrammar.bnf") :auto-whitespace @ignore))
-  (@grammar (get-contents file-name)))
+(defn walk-tree [tree]
+  (walk/prewalk #'ProcessTreePart tree)
+  )
+
