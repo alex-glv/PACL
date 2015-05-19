@@ -3,19 +3,26 @@
             [clojure.java.io :as io]
             [pacl.protocols :as p]
             [clojure.walk :as walk] :reload-all))
-(defmulti ProcessTreePart
-  (fn [el] (if (coll? el)
-             (first el)
-             nil)
-    ))
 
 (def fil-cl (rdr/get-ast (io/resource "class.php")))
 
-(defmethod ProcessTreePart :class_declaration_statement [el] (println "from-class:") (prn el) el)
-(defmethod ProcessTreePart :class_statement [el] (println "class-statements:") (prn el) el)
-(defmethod ProcessTreePart :default [el] el)
+(defmulti processtreepart
+  (fn [el]
+    (if (coll? el)
+      (first el)
+      el )
+    ))
 
 (defn walk-tree [tree]
-  (walk/prewalk #'ProcessTreePart tree)
-  )
+  (trampoline processtreepart tree ))
+
+(defmethod processtreepart :class_declaration_statement [el] (println "class declaration") #(processtreepart (first  (rest el))) )
+(defmethod processtreepart :class_statement [el] (println "class statement") #(processtreepart (first  (rest el))))
+(defmethod processtreepart :method_modifiers [el] (println "methodmodifiers") #(processtreepart (first  (rest el))))
+(defmethod processtreepart :variable_modifiers [el] (println "variable modifiers") #(processtreepart (first (rest el))))
+(defmethod processtreepart :default [el]
+  
+  (if (coll? el)
+    #(processtreepart  (first (rest  el)))
+    nil))
 
