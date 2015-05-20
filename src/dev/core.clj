@@ -13,16 +13,24 @@
       el )
     ))
 
-(defn walk-tree [tree]
-  (trampoline processtreepart tree ))
+(defn tree-assembler [element]
+  (processtreepart element)
+  (fn [] (walk-tree element tree-assembler)))
 
-(defmethod processtreepart :class_declaration_statement [el] (println "class declaration") #(processtreepart (first  (rest el))) )
-(defmethod processtreepart :class_statement [el] (println "class statement") #(processtreepart (first  (rest el))))
-(defmethod processtreepart :method_modifiers [el] (println "methodmodifiers") #(processtreepart (first  (rest el))))
-(defmethod processtreepart :variable_modifiers [el] (println "variable modifiers") #(processtreepart (first (rest el))))
-(defmethod processtreepart :default [el]
-  
-  (if (coll? el)
-    #(processtreepart  (first (rest  el)))
-    nil))
+
+(defn walk-tree [tree processor-fn]
+  (map (fn [element]
+         (trampoline
+          (fn [el]
+            (when (coll? el)
+              (processor-fn el))) element))
+       tree))
+
+(defmethod processtreepart :class_declaration_statement [el] (println "class declaration" el) )
+(defmethod processtreepart :class_statement [el] (println "class statement" :statement))
+(defmethod processtreepart :method_modifiers [el] (println "methodmodifiers") )
+(defmethod processtreepart :property_list [el] (println "property_list" (second el)))
+(defmethod processtreepart :variable_modifiers [el] (println "variable modifiers") )
+(defmethod processtreepart :property [el] (println "property" el))
+(defmethod processtreepart :default [el])
 
