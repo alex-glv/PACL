@@ -4,7 +4,7 @@
             [pacl.protocols :as p]
             [clojure.walk :as walk] :reload-all))
 
-(declare walk-tree)
+(declare walk-tree replace-last)
 
 (defmulti processtreepart
   (fn [el]
@@ -12,28 +12,40 @@
       (first el))))
 
 
-(defn tree-assembler [current-tree element]
-  (let [processed (processtreepart element)
-        tree (if (nil? processed) current-tree (conj current-tree processed))]
-    (fn [] (walk-tree element tree tree-assembler))
-    ))
+(defn tree-assembler
+  ([form]
+   (tree-assembler [] form))
+  ([tree form]
+   (let [processed (processtreepart form)
+         children (if (coll? form)
+                    (map (fn [el] (walk-tree el tree-assembler)) form)
+                    nil)]
+     (if (nil? processed)
+       (if (empty? children)
+         tree
+         (conj tree children))
+       (if (empty? children)
+         (conj tree processed)
+         (replace-last (conj tree processed) children))))))
 
-(defn walk-tree
-  ([top processor-fn]
-   (walk-tree top [] processor-fn))
-  ([top tree processor-fn]
-   (let [ only-colls (filter coll? top)  ]
-     (if (empty? only-colls)
-       tree
-       (map (fn [element]
-              (trampoline (fn [el] (processor-fn tree el)) element))
-            only-colls)))))
+(defn walk-tree [top processor-fn]
+  (let [children (map (fn [element]
+                        (let [res (processor-fn element)]
+                          res))
+                      top)
+        non-empty-ch (filter (complement nil?)  children)]
 
-(defmethod processtreepart :class_declaration_statement [el]  (nth el 2))
+    non-empty-ch))
+
+(defn replace-last [coll item]
+  (let [coll-last (last coll)]
+    (conj (pop coll) [coll-last [item]])))
+
+(defmethod processtreepart :class_declaration_statement [el] :class_declaration_statement)
 (defmethod processtreepart :class_statement [el]  :statement)
 (defmethod processtreepart :method_modifiers [el]  :method_modifiers)
 (defmethod processtreepart :property_list [el]  :property_list)
 (defmethod processtreepart :variable_modifiers [el]  :variable_modifiers)
 (defmethod processtreepart :property [el]  :property)
-(defmethod processtreepart :default [el])
+(defmethod processtreepart :default [el] nil)
 
