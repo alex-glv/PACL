@@ -9,7 +9,8 @@
 (defmulti processtreepart
   (fn [el]
     (if (coll? el)
-      (first el))))
+      (first el)
+      )))
 
 
 (defn tree-assembler
@@ -18,15 +19,16 @@
   ([tree form]
    (let [processed (processtreepart form)
          children (if (coll? form)
-                    (map (fn [el] (walk-tree el tree-assembler)) form)
+                    (map (fn [el] (walk-tree el #'tree-assembler)) form)
                     nil)]
      (if (nil? processed)
        (if (empty? children)
-         tree
-         (conj tree children))
+         nil
+         children))
        (if (empty? children)
-         (conj tree processed)
-         (replace-last (conj tree processed) children))))))
+         processed
+         [processed [children]]))))
+
 
 (defn walk-tree [top processor-fn]
   (let [children (map (fn [element]
