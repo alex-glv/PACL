@@ -3,7 +3,9 @@
   :url ""
   :license {:name "MIT"
             :url "LICENSE"}
+  :repositories [
+                 ["nba" "http://bits.netbeans.org/nexus/content/groups/netbeans/"]]
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [instaparse "1.3.6"]]
+                 [org.netbeans.modules/org-netbeans-modules-php-api-editor "RELEASE802"]]
   :plugins [[lein-ring "0.8.13"]]
   )
