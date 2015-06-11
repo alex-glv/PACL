@@ -1,7 +1,7 @@
 (ns pacl.reader
   (:require [clojure.walk :as walk]
-            [instaparse.core :as insta]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io])
+  (:import [org.eclipse.php.internal.core.compiler.ast.parser]))
 
 (def ^:dynamic *debug* false)
 (def ^:dynamic *debug-fn* 'println)
@@ -13,21 +13,12 @@
 
 (defn get-files-by-mask [mask])
 
+
+
 (defn scan-dir [dir]
   (when *debug*
     (*debug-fn* "Scanning " dir))
   (file-seq (clojure.java.io/file dir)))
-
-(def ignore
-  (insta/parser (get-contents "whitespace.bnf" (comp io/file io/resource))))
-
-(def grammar
-  (insta/parser (get-contents "phpgrammar.bnf" (comp io/file io/resource)) :auto-whitespace ignore))
-
-(defn get-ast [file-res]
-  (when *debug*
-    (*debug-fn* "Parsing " file-res))
-  (grammar (get-contents file-res)))
 
 (def context-map
   [{:prefix "::" :recipient :static-method}
