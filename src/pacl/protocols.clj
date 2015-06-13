@@ -1,16 +1,13 @@
 (ns pacl.protocols)
 
 (defprotocol PhpCompleatableEntity
-  (will-respond-to [context]))
-
-(deftype PhpClass [file class methods properties]
-  PhpCompleatableEntity
-  (will-respond-to [_]))
+  (will-respond-to [this context]))
 
 (deftype PhpClassMethod [visibility name arguments]
   PhpCompleatableEntity
-  (will-respond-to [_]))
+  (will-respond-to [this context])
+  )
 
 (deftype PhpClassProperty [visibility name defvalue]
   PhpCompleatableEntity
-  (will-respond-to [_]))
+  (will-respond-to [this context]))
