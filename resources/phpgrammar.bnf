@@ -1,5 +1,3 @@
-S = top_statement_list | <EMPTY>
-
 T_LNUMBER   ::= #'[0-9]+'
 T_DNUMBER   ::=  (#'[0-9]*[\.]'{T_LNUMBER}) | ({T_LNUMBER}#'[\.][0-9]*')
 T_STRING    ::= #'[^\s;\{\(\[\]\)\},]+' | #'"[^"]*"' | #'\'[^\']*\''

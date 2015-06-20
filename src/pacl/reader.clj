@@ -22,7 +22,7 @@
   (insta/parser (get-contents "whitespace.bnf" (comp io/file io/resource))))
 
 (def grammar
-  (insta/parser (get-contents "phpgrammar.bnf" (comp io/file io/resource)) :auto-whitespace ignore))
+  (insta/parser (get-contents "phpgrammar.bnf" (comp io/file io/resource)) :auto-whitespace ignore :start :top_statement_list))
 
 (defn get-ast [file-res]
   (when *debug*

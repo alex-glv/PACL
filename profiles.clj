@@ -2,5 +2,6 @@
         :dependencies [
                        [org.clojure/tools.nrepl "0.2.7"]
                        [refactor-nrepl "1.0.3"]
-                       [org.clojure/core.async "0.1.346.0-17112a-alpha"]]}}
+                       [org.clojure/core.async "0.1.346.0-17112a-alpha"]
+                       [rhizome "0.2.5"]]}}
 

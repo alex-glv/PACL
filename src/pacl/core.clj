@@ -1,9 +1,10 @@
 (ns pacl.core
   (:require [pacl.reader :as rdr]
             [clojure.java.io :as io]
-            [clojure.walk]
             [clojure.zip]
             ))
+
+(declare walk-tree)
 
 (defprotocol ZipperAst
   (init [this])
